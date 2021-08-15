@@ -22,87 +22,63 @@ mongoose.connect(
     "mongodb+srv://saya:12345@cluster0.o86hz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", { useNewUrlParser: true }
 );
 
-
-// app.post("/submit", ({ body }, res) => {
-//     db.Book.create(body)
-//         .then(({ _id }) => db.Library.findOneAndUpdate({}, { $push: { books: _id } }, { new: true }))
-//         .then(dbLibrary => {
-//             res.json(dbLibrary);
-//         })
-//         .catch(err => {
-//             res.json(err);
-//         });
-// });
-
-// app.get("/books", (req, res) => {
-//     db.Book.find({})
-//         .then(dbBook => {
-//             res.json(dbBook);
-//         })
-//         .catch(err => {
-//             res.json(err);
-//         });
-// });
-
-// app.get("/library", (req, res) => {
-//     db.Library.find({})
-//         .then(dbLibrary => {
-//             res.json(dbLibrary);
-//         })
-//         .catch(err => {
-//             res.json(err);
-//         });
-// });
-
-// app.get("/populated", (req, res) => {
-//     db.Library.find({})
-//         .populate("books")
-//         .then(dbLibrary => {
-//             res.json(dbLibrary);
-//         })
-//         .catch(err => {
-//             res.json(err);
-//         });
-// });
-
 app.get("/", (req, res) => {
     res.send("homepage");
 });
-
+//join index.html
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "./public", "index.html"));
+});
+//join exercise.html
 app.get("/exercise", (req, res) => {
     res.sendFile(path.join(__dirname, "./public", "exercise.html"));
 });
-
+//join stats.html
+app.get("/stats", (req, res) => {
+    res.sendFile(path.join(__dirname, "./public", "stats.html"));
+});
+// get workout
 app.get("/api/workouts", (req, res) => {
-    workoutModel
-        .aggregate([{
-            $addFields: {
-                totalDuration: {
-                    $sum: "$exercises.duration",
-                },
+    workoutModel.aggregate([{
+        $addFields: {
+            totalDuration: {
+                $sum: "$exercises.duration",
             },
-        }, ])
+        },
+    }, ])
 
     .then((data) => {
-        res.json(data);
-    }).catch(err => {
-        res.json(err)
-    })
-});
-
-app.post("/api/workouts", ({ body }, res) => {
-    workoutModel
-        .create(body)
-        .then(({ _id }) =>
-            workoutModel.findOneAndUpdate({}, { $push: { workoutSeed } }, { new: true })
-        )
-        .then((data) => {
+            console.log("ADDED", data);
             res.json(data);
         })
         .catch((err) => {
             res.json(err);
         });
 });
+// create workout
+app.post("/api/workouts", ({ body }, res) => {
+    workoutModel
+        .create(body)
+        .then((data) => res.json(data))
+        .catch((err) => res.json(err));
+});
+// Add exercises
+app.put("/api/workouts/:id", (req, res) => {
+    workoutModel.findOneAndUpdate({ _id: req.params.id }, {
+            $inc: { totalDuration: req.body.duration },
+            $push: { exercises: req.body.exercises },
+        }, { new: true })
+        .then((data) => {
+            console.log("data:", data);
+            res.json(data);
+        })
+        .catch((err) => {
+            res.json(err);
+        });
+
+});
+//get workout in range
+
 
 app.listen(PORT, () => {
     console.log(`App running on port ${PORT}!`);
