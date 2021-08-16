@@ -7,6 +7,7 @@ const PORT = process.env.PORT || 3000;
 
 const workoutModel = require("./models/Workout");
 
+
 const app = express();
 
 app.use(logger("dev"));
@@ -18,9 +19,9 @@ app.use(express.static("public"));
 
 mongoose.connect(
     process.env.MONGODB_URI ||
-    // "mongodb://localhost/populate"
-    "mongodb+srv://saya:12345@cluster0.o86hz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", { useNewUrlParser: true }
+    "mongodb://localhost/populate", { useNewUrlParser: true }
 );
+//"mongodb+srv://saya:12345@cluster0.o86hz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
 
 app.get("/", (req, res) => {
     res.send("homepage");
@@ -39,34 +40,36 @@ app.get("/stats", (req, res) => {
 });
 // get workout
 app.get("/api/workouts", (req, res) => {
-    workoutModel.aggregate([{
-        $addFields: {
-            totalDuration: {
-                $sum: "$exercises.duration",
+    workoutModel
+        .aggregate([{
+            $addFields: {
+                totalDuration: {
+                    $sum: "$exercises.duration",
+                },
             },
-        },
-    }, ])
-
-    .then((data) => {
-            console.log("ADDED", data);
+        }, ])
+        .then((data) => {
+            console.log("data:", data);
             res.json(data);
         })
         .catch((err) => {
             res.json(err);
         });
 });
+
 // create workout
 app.post("/api/workouts", ({ body }, res) => {
     workoutModel
-        .create(body)
+        .create(body.id)
         .then((data) => res.json(data))
         .catch((err) => res.json(err));
 });
 // Add exercises
 app.put("/api/workouts/:id", (req, res) => {
-    workoutModel.findOneAndUpdate({ _id: req.params.id }, {
+    workoutModel
+        .findOneAndUpdate({ _id: req.params.id }, {
             $inc: { totalDuration: req.body.duration },
-            $push: { exercises: req.body.exercises },
+            $push: { exercises: req.body },
         }, { new: true })
         .then((data) => {
             console.log("data:", data);
@@ -77,7 +80,37 @@ app.put("/api/workouts/:id", (req, res) => {
         });
 
 });
-//get workout in range
+// delete workout
+app.delete('/api/workouts', ({ body }, res) => {
+    workoutModel
+        .findByIdAndDelete(body.id)
+        .then(() => {
+            res.json(true);
+        })
+        .catch((err) => {
+            res.json(err);
+        });
+})
+
+// get workouts range
+app.get("/api/workouts/range", (req, res) => {
+    workoutModel
+        .aggregate([{
+            $addFields: {
+                totalDuration: {
+                    $sum: "$exercises.duration",
+                },
+            },
+        }, ]).sort({ _id: -1 })
+        .limit(7)
+        .then((data) => {
+            console.log("data:", data);
+            res.json(data);
+        })
+        .catch((err) => {
+            res.json(err);
+        });
+});
 
 
 app.listen(PORT, () => {
