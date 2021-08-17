@@ -21,7 +21,7 @@ mongoose.connect(
     process.env.MONGODB_URI ||
     "mongodb://localhost/populate", { useNewUrlParser: true }
 );
-//"mongodb+srv://saya:12345@cluster0.o86hz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+
 
 app.get("/", (req, res) => {
     res.send("homepage");
