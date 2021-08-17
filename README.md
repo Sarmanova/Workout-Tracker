@@ -5,16 +5,15 @@
 
   ## Link to Deployed Site
 
-Link deployed in Heroku: https://workout-tracker1993.herokuapp.com/?id=611acdcd906662001689a8b5
+  Link deployed in Heroku: https://workout-tracker1993.herokuapp.com/?id=611b083c4939140016086c83
 
-  ## Github Link
-  Deployed in GitHub :  https://sarmanova.github.io/Workout-Tracker/
+
 
   ## Acceptance Criteria
 
-When the user loads the page, they should be given the option to create a new workout or continue with their last workout.
+   When the user loads the page, they should be given the option to create a new workout or continue with their last workout.
 
-The user should be able to:
+   The user should be able to:
 
   * Add exercises to the most recent workout plan.
 
