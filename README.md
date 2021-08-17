@@ -8,6 +8,7 @@
 Link deployed in Heroku: https://workout-tracker1993.herokuapp.com/?id=611acdcd906662001689a8b5
 
   ## Github Link
+  Deployed in GitHub :  https://sarmanova.github.io/Workout-Tracker/
 
   ## Acceptance Criteria
 
